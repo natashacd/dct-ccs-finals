@@ -7,7 +7,7 @@
 <div class="d-flex">
 
     <div class="content flex-grow-1 p-10">
-        <h2>Add a New Subject</h2>
+        <h2 class="mb-5">Add a New Subject</h2>
         
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -16,23 +16,21 @@
             </ol>
         </nav>
 
-        <div class="card p-3 mb-4">
+        <div class="card p-5 mb-4">
             <form action="add_subject.php" method="POST">
-                <div class="mb-3">
-                    <label for="subjectCode" class="form-label">Subject Code</label>
-                    <input type="text" id="subjectCode" name="subject_code" class="form-control" placeholder="Subject Code" required>
+                <div class="mb-3 ">
+                    <input type="text" id="subjectCode" name="subject_code" class="form-control p-3" placeholder="Subject Code">
                 </div>
                 <div class="mb-3">
-                    <label for="subjectName" class="form-label">Subject Name</label>
-                    <input type="text" id="subjectName" name="subject_name" class="form-control" placeholder="Subject Name" required>
+                    <input type="text" id="subjectName" name="subject_name" class="form-control p-3" placeholder="Subject Name" >
                 </div>
-                <button type="submit" class="btn btn-primary">Add Subject</button>
+                <button type="submit" class="btn btn-primary w-100">Add Subject</button>
             </form>
         </div>
 
-        <div class="card p-3">
+        <div class="card p-5">
             <h4>Subject List</h4>
-            <table class="table table-bordered">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Subject Code</th>
