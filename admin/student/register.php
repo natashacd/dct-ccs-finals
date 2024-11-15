@@ -17,19 +17,25 @@
         </nav>
 
         <div class="card p-5 mb-4">
-            <form action="register.php" method="POST">
-                <div class="mb-3 ">
-                    <input type="text" id="subjectCode" name="student_id" class="form-control p-3" placeholder="Student ID">
-                </div>
-                <div class="mb-3">
-                    <input type="text" id="subjectName" name="first_name" class="form-control p-3" placeholder="First Name" >
-                </div>
-                <div class="mb-3">
-                    <input type="text" id="subjectName" name="lastname_name" class="form-control p-3" placeholder="Last Name" >
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Register Subject</button>
-            </form>
+    <form action="register.php" method="POST">
+        <div class="mb-3 form-floating">
+            <input type="text" id="subjectCode" name="student_id" class="form-control p-3" placeholder="Student ID">
+            <label for="subjectCode">Student ID</label>
         </div>
+        
+        <div class="mb-3 form-floating">
+            <input type="text" id="subjectName" name="first_name" class="form-control p-3" placeholder="First Name">
+            <label for="subjectName">First Name</label>
+        </div>
+        
+        <div class="mb-3 form-floating">
+            <input type="text" id="lastName" name="lastname_name" class="form-control p-3" placeholder="Last Name">
+            <label for="lastName">Last Name</label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary w-100">Register Subject</button>
+    </form>
+</div>
 
         <div class="card p-5">
     <h4>Subject List</h4>

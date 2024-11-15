@@ -15,15 +15,15 @@ include '../partials/side-bar.php';
                 </ol>
             </nav>
             <div class="container-fluid border p-5 rounded"> 
-                <div class="form-container">
-                    <div class="mb-3">
-                        <label for="subjectId" class="form-label">Subject ID</label>
-                        <input type="text" class="form-control" id="subjectId" value="1001">
-                    </div>
-                    <div class="mb-3">
-                        <label for="subjectName" class="form-label">Subject Name</label>
-                        <input type="text" class="form-control" id="subjectName" value="English">
-                    </div>
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" id="subjectId" value="1001" placeholder="Subject ID">
+                    <label for="subjectId">Subject ID</label>
+                </div>
+
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" id="subjectName" value="English" placeholder="Subject Name">
+                    <label for="subjectName">Subject Name</label>
+                </div>
                     <button type="submit" class="btn btn-primary w-100">Update Subject</button>
                 </div>
             </div>
