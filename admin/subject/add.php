@@ -17,17 +17,20 @@
         </nav>
 
         <div class="card p-5 mb-4">
-            <form action="add_subject.php" method="POST">
-                <div class="mb-3 ">
+            <form action="add.php" method="POST">
+                <div class="mb-3 form-floating">
                     <input type="text" id="subjectCode" name="subject_code" class="form-control p-3" placeholder="Subject Code">
+                    <label for="subjectCode">Subject Code</label>
                 </div>
-                <div class="mb-3">
-                    <input type="text" id="subjectName" name="subject_name" class="form-control p-3" placeholder="Subject Name" >
+
+                <div class="mb-3 form-floating">
+                    <input type="text" id="subjectName" name="subject_name" class="form-control p-3" placeholder="Subject Name">
+                    <label for="subjectName">Subject Name</label>
                 </div>
+
                 <button type="submit" class="btn btn-primary w-100">Add Subject</button>
             </form>
         </div>
-
         <div class="card p-5">
             <h4>Subject List</h4>
             <table class="table table-striped">
