@@ -4,11 +4,9 @@ include '../partials/header.php';
 include '../partials/side-bar.php';
 ?>
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">    
-    <div class="container-fluid position-relative"> <!-- Use container-fluid for full width -->
+    <div class="container-fluid position-relative"> 
         <div class="content flex-grow-1 p-10">
             <h2 class="mb-5">Edit Subject</h2>
-
-            <!-- Breadcrumb -->
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="../dashboard.php">Dashboard</a></li>
@@ -16,9 +14,7 @@ include '../partials/side-bar.php';
                     <li class="breadcrumb-item active" aria-current="page">Edit Subject</li>
                 </ol>
             </nav>
-
-            <!-- Edit Subject Form -->
-            <div class="container-fluid border p-5 rounded"> <!-- Use container-fluid for full width -->
+            <div class="container-fluid border p-5 rounded"> 
                 <div class="form-container">
                     <div class="mb-3">
                         <label for="subjectId" class="form-label">Subject ID</label>
