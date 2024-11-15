@@ -18,19 +18,19 @@ include '../partials/side-bar.php';
                 <div class="form-container">
                     <div class="mb-3">
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="subjectId" value="1001" placeholder="Student ID">
+                            <input type="text" class="form-control" id="studentId" value="1001" placeholder="Student ID">
                             <label for="subjectId">Student ID</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="subjectName" value="Renmark" placeholder="First Name">
+                            <input type="text" class="form-control" id="studentfName" value="Renmark" placeholder="First Name">
                             <label for="subjectName">First Name</label>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="subjectDescription" value="Salalila" placeholder="Last Name">
+                            <input type="text" class="form-control" id="studentlName" value="Salalila" placeholder="Last Name">
                             <label for="subjectDescription">Last Name</label>
                         </div>
                     </div>
