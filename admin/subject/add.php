@@ -43,8 +43,8 @@
                         <td>1001</td>
                         <td>English</td>
                         <td>
-                        <a href="edit.php?id=1001" class="btn btn-primary btn-sm">Edit</a>
-                        <a href="delete.subject.php?id=1001" class="btn btn-danger btn-sm">Delete</a>
+                        <a href="edit.php?id=1001" class="btn btn-info btn-sm">Edit</a>
+                        <a href="delete.php?id=1001" class="btn btn-danger btn-sm">Delete</a>
                         </td>
                     </tr>
                 </tbody>
