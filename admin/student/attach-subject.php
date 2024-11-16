@@ -8,8 +8,8 @@
             <h2 class="mb-5">Attach Subject to Student</h2>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="#">Register Student</a></li>
+                <li class="breadcrumb-item"><a href="../dashboard.php">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="register.php">Register Student</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Attach Subject to Student</li>
                 </ol>
             </nav>
