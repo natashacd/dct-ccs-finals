@@ -1,5 +1,11 @@
 <!-- Template Files here -->
 <?php
+include '../functions.php';
+
+
+guard();
+
+$_SESSION['page'] = '/admin/dashboard.php';
  $pagetitle = 'Dashboard';
  include './partials/header.php';
  include './partials/side-bar.php';

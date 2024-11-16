@@ -1,3 +1,15 @@
+<?php
+include 'functions.php';
+returnPage();
+
+$errorHtml = '';
+if ($_SERVER["REQUEST_METHOD"] == "POST"){
+    $email = $_POST['email'];
+    $password = md5($_POST['password']);
+
+    $errorHtml = validateLoginCredentials($email, $password);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,9 +23,10 @@
 <body class="bg-secondary-subtle">
     <div class="d-flex align-items-center justify-content-center vh-100">
         <div class="col-3">
-            <!-- Server-Side Validation Messages should be placed here -->
+                      <!-- Server-Side Validation Messages should be placed here -->
+                      <?php echo renderErrorMessage($errorHtml); ?>  
             <div class="card">
-                <div class="card-body">
+                <div class="card-body">   
                     <h1 class="h3 mb-4 fw-normal">Login</h1>
                     <form method="post" action="">
                         <div class="form-floating mb-3">
@@ -26,7 +39,6 @@
                         </div>
                         <div class="form-floating mb-3">
                             <button type="submit" name="login" class="btn btn-primary w-100">Login</button>
-                            <a href="./admin/dashboard.php">login</a>
                         </div>
                     </form>
                 </div>

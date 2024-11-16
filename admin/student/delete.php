@@ -9,7 +9,7 @@ include '../partials/side-bar.php';
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="../dashboard.php">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="delete.php">Register Student</a></li>
+                <li class="breadcrumb-item"><a href="register.php">Register Student</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Delete Student</li>
                 </ol>
             </nav>
