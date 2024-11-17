@@ -8,7 +8,7 @@ $database = 'dct-ccs-finals';
 
 $conn = new mysqli($host, $user, $password, $database);
 
-if ($conn->connect_error){
+if ($conn->connect_error) {
     die("Connection Failed: . $conn->connect_error");
 }
 
@@ -28,59 +28,74 @@ function returnPage()
     }
 }
 
-
 function logIn($email, $password)
 {
     global $conn;
-    $sql = "SELECT password FROM users WHERE email =?";
+    $sql = "SELECT password FROM users WHERE email = ?";
     $stmt = $conn->prepare($sql);
 
     if (!$stmt) {
         echo "Error: " . $conn->error;
         return false;
     }
-    $stmt ->bind_param("s", $email);
+    $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows === 1) {
         $row = $result->fetch_assoc();
-        if($password == $row['password']) {
+        if ($password == $row['password']) {
+
             $_SESSION['email'] = $email;
+
+            $fetchSubjectsSQL = "SELECT subject_code, subject_name FROM subjects";
+            $subjectResult = $conn->query($fetchSubjectsSQL);
+
+            if ($subjectResult && $subjectResult->num_rows > 0) {
+                $_SESSION['subjects'] = [];
+                while ($subject = $subjectResult->fetch_assoc()) {
+                    $_SESSION['subjects'][] = [
+                        'subject_code' => $subject['subject_code'],
+                        'subject_name' => $subject['subject_name']
+                    ];
+                }
+            } else {
+                $_SESSION['subjects'] = []; 
+            }
+
             header('Location: admin/dashboard.php');
             exit;
         } else {
-           return [
-                'success'   => false,
-                'error'     => '<li>Invalid email or password.</li>'
-           ];
+            return [
+                'success' => false,
+                'error' => '<li>Invalid email or password.</li>'
+            ];
         }
     } else {
         return [
-            'success'   => false,
-            'error'     => '<li>Invalid email.</li>'
-       ];
+            'success' => false,
+            'error' => '<li>Invalid email.</li>'
+        ];
     }
 
     $stmt->close();
 }
 
-    
-function validateLoginCredentials($email, $password) {
+function validateLoginCredentials($email, $password)
+{
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errorMessage = '';
-    
-        if (empty($email)) {
+
+        if (empty($email) || empty($password)) {
             $errorMessage .= "<li>Email is required.<br></li><li>Password is required.</li>";
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-
             $errorMessage .= "<li>Invalid email.<br></li>";
         }
-    
+
         if (empty($password)) {
             $errorMessage .= "<li>Password is required.</li>";
         }
-    
+
         if (!empty($errorMessage)) {
             return $errorMessage;
         } else {
@@ -91,9 +106,96 @@ function validateLoginCredentials($email, $password) {
         }
         return true;
     }
-    
-       
 }
+
+function addSubject($subject_code, $subject_name)
+{
+    global $conn;
+
+    if (!isset($_SESSION['subjects'])) {
+        $_SESSION['subjects'] = [];
+    }
+
+    $errors = [];
+
+    if (empty($subject_code)) {
+        $errors[] = "<li>Subject Code is required.</li>";
+    }
+    if (empty($subject_name)) {
+        $errors[] = "<li>Subject Name is required.</li>";
+    }
+
+    foreach ($_SESSION['subjects'] as $subject) {
+        if ($subject['subject_name'] === $subject_name) {
+            $errors[] = "Duplicate Subject Name.";
+            break;
+        }
+    
+        if ($subject['subject_code'] === $subject_code) {
+            $errors[] = "Duplicate Subject Code.";
+            break;
+        }
+    
+        if ($subject['subject_name'] === $subject_code && $subject['subject_code'] === $subject_name) {
+            $errors[] = "<li>Duplicate Subject Name.</li> <li>Duplicate Subject Code.</li>";
+            break;
+        }
+    }
+    
+    if (empty($errors)) {
+        $sql = "INSERT INTO subjects (subject_code, subject_name) VALUES (?, ?)";
+        $stmt = $conn->prepare($sql);
+
+        if (!$stmt) {
+            echo "Error: " . $conn->error;
+            return [
+                'success' => false,
+                'errors' => ["Failed to prepare the SQL statement."]
+            ];
+        }
+
+        $stmt->bind_param("ss", $subject_code, $subject_name);
+        
+        if ($stmt->execute()) {
+            $_SESSION['subjects'][] = [
+                'subject_code' => $subject_code,
+                'subject_name' => $subject_name
+            ];
+            $_SESSION['success'] = "Subject added successfully.";
+            return [
+                'success' => true,
+                'errors' => []
+            ];
+        } else {
+            $errors[] = "Failed to insert subject into the database.";
+            return [
+                'success' => false,
+                'errors' => $errors
+            ];
+        }
+
+        $stmt->close();
+    }
+
+    return [
+        'success' => false,
+        'errors' => $errors
+    ];
+}
+
+function getSubjectdash($conn)
+{
+    $subjectCount = 0;
+    $sql = "SELECT COUNT(*) AS subject_count FROM subjects";
+    $result = $conn->query($sql);
+
+    if ($result && $row = $result->fetch_assoc()) {
+        $subjectCount = $row['subject_count'];
+    }
+
+    return $subjectCount;
+}
+
 
 function renderErrorMessage($errorHtml)
 {
@@ -110,8 +212,8 @@ function renderErrorMessage($errorHtml)
     }
 }
 
-function logout() {
+function logout()
+{
     session_destroy();
     header("Location: /index.php");
 }
-?>
