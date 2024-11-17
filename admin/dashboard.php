@@ -1,15 +1,17 @@
-<!-- Template Files here -->
 <?php
+// Include required files
 include '../functions.php';
-
 
 guard();
 
 $_SESSION['page'] = '/admin/dashboard.php';
- $pagetitle = 'Dashboard';
- include './partials/header.php';
- include './partials/side-bar.php';
- ?>
+$pagetitle = 'Dashboard';
+include './partials/header.php';
+include './partials/side-bar.php';
+
+
+$subjectDash = getSubjectDash($conn);
+?>
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">    
     <h1 class="h2">Dashboard</h1>        
     
@@ -18,7 +20,7 @@ $_SESSION['page'] = '/admin/dashboard.php';
             <div class="card border-primary mb-3">
                 <div class="card-header bg-primary text-white border-primary">Number of Subjects:</div>
                 <div class="card-body text-primary">
-                    <h5 class="card-title">0</h5>
+                    <h5 class="card-title"><?php echo $subjectDash; ?></h5>
                 </div>
             </div>
         </div>
