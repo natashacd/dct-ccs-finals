@@ -1,17 +1,16 @@
 <?php
-// Include required files
+include './partials/header.php';
 include '../functions.php';
 
 guard();
 
 $_SESSION['page'] = '/admin/dashboard.php';
 $pagetitle = 'Dashboard';
-include './partials/header.php';
+
 include './partials/side-bar.php';
 
-// Fetch the number of subjects and students
 $subjectDash = getSubjectDash($conn);
-$studentDash = getStudentDash($conn); // Get the number of students
+$studentDash = getStudentDash($conn); 
 ?>
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">    
@@ -52,3 +51,6 @@ $studentDash = getStudentDash($conn); // Get the number of students
         </div>
     </div>    
 </main>
+<?php
+include './partials/footer.php';
+?>
