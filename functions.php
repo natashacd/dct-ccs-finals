@@ -235,7 +235,35 @@ function editSubject($subject_code, $subject_name)
     }
 }
 
+function deleteSubject($subject_code)
+{
+    global $conn;
 
+    $sql = "DELETE FROM subjects WHERE subject_code = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $subject_code);
+
+    if ($stmt->execute()) {
+
+        foreach ($_SESSION['subjects'] as $key => $sub) {
+            if ($sub['subject_code'] == $subject_code) {
+                unset($_SESSION['subjects'][$key]);
+                break;
+            }
+        }
+        $stmt->close();
+        return [
+            'success' => true,
+            'errors' => []
+        ];
+    } else {
+        $stmt->close();
+        return [
+            'success' => false,
+            'errors' => ["Failed to delete subject from the database."]
+        ];
+    }
+}
 
 function getSubjectdash($conn)
 {
