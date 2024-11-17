@@ -278,6 +278,86 @@ function getSubjectdash($conn)
     return $subjectCount;
 }
 
+function registerStudent($student_id, $first_name, $last_name)
+{
+    global $conn;
+
+
+    if (empty($student_id) || empty($first_name) || empty($last_name)) {
+        return [
+            'success' => false,
+            'errors' => ["<li>Student ID is required.</li><li>First Name is required.</li><li>Last Name is required.</li>"]
+        ];
+    }
+
+
+    $sql = "SELECT COUNT(*) FROM students WHERE student_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $student_id);
+    $stmt->execute();
+    $stmt->bind_result($count);
+    $stmt->fetch();
+    $stmt->close();
+
+    if ($count > 0) {
+        return [
+            'success' => false,
+            'errors' => ["<li>Duplicate Student ID.</li>"]
+        ];
+    }
+
+    $sql = "INSERT INTO students (student_id, first_name, last_name) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $student_id, $first_name, $last_name);
+    if ($stmt->execute()) {
+        $stmt->close();
+        return [
+            'success' => true,
+            'errors' => []
+        ];
+    } else {
+        $stmt->close();
+        return [
+            'success' => false,
+            'errors' => ["<li>Failed to register student.</li>"]
+        ];
+    }
+}
+
+
+function getStudents() {
+    global $conn;
+
+
+    $students = [];
+
+    $sql = "SELECT student_id, first_name, last_name FROM students"; 
+
+
+    $result = $conn->query($sql);
+
+
+    if ($result && $result->num_rows > 0) {
+        while ($student = $result->fetch_assoc()) {
+            $students[] = $student; 
+        }
+    }
+
+    return $students; 
+}
+
+function getStudentDash($conn)
+{
+    $studentCount = 0; 
+    $sql = "SELECT COUNT(*) AS student_count FROM students"; 
+    $result = $conn->query($sql);
+
+    if ($result && $row = $result->fetch_assoc()) {
+        $studentCount = $row['student_count']; 
+    }
+
+    return $studentCount; 
+}
 
 function renderErrorMessage($errorHtml)
 {
