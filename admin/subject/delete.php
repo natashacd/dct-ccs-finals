@@ -3,7 +3,7 @@ $pagetitle = 'Delete Subject';
 include '../partials/header.php';
 
 include '../../functions.php'; 
-
+guard();
 
 $errors = [];
 $successMessage = '';
