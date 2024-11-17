@@ -384,6 +384,26 @@ function updateStudent($student_id, $first_name, $last_name) {
     }
 }
 
+function deleteStudent($student_id) {
+    global $conn;
+
+    $sql = "DELETE FROM students WHERE student_id = ?";
+
+    $stmt = $conn->prepare($sql);
+    
+    $stmt->bind_param("s", $student_id);
+
+
+    if ($stmt->execute()) {
+        $stmt->close();
+        return true; 
+    } else {
+        $stmt->close();
+        return false; 
+    }
+}
+
+
 function getStudentDash($conn)
 {
     $studentCount = 0; 
