@@ -346,6 +346,44 @@ function getStudents() {
     return $students; 
 }
 
+function getStudentById($student_id) {
+    global $conn;
+    $sql = "SELECT student_id, first_name, last_name FROM students WHERE student_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $student_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc(); 
+}
+
+function updateStudent($student_id, $first_name, $last_name) {
+    global $conn;
+
+
+    if (empty($first_name) || empty($last_name)) {
+        return [
+            'success' => false,
+            'errors' => ["<li>First Name is required.</li><li>Last Name is required.</li>"]
+        ];
+    }
+
+    $sql = "UPDATE students SET first_name = ?, last_name = ? WHERE student_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $first_name, $last_name, $student_id);
+
+    if ($stmt->execute()) {
+        return [
+            'success' => true,
+            'errors' => []
+        ];
+    } else {
+        return [
+            'success' => false,
+            'errors' => ["Failed to update student."]
+        ];
+    }
+}
+
 function getStudentDash($conn)
 {
     $studentCount = 0; 
