@@ -118,12 +118,14 @@ function addSubject($subject_code, $subject_name)
 
     $errors = [];
 
+
     if (empty($subject_code)) {
         $errors[] = "<li>Subject Code is required.</li>";
     }
     if (empty($subject_name)) {
         $errors[] = "<li>Subject Name is required.</li>";
     }
+
 
     foreach ($_SESSION['subjects'] as $subject) {
         if ($subject['subject_name'] === $subject_name) {
@@ -142,22 +144,19 @@ function addSubject($subject_code, $subject_name)
         }
     }
     
+
     if (empty($errors)) {
+
         $sql = "INSERT INTO subjects (subject_code, subject_name) VALUES (?, ?)";
         $stmt = $conn->prepare($sql);
 
-        if (!$stmt) {
-            echo "Error: " . $conn->error;
-            return [
-                'success' => false,
-                'errors' => ["Failed to prepare the SQL statement."]
-            ];
-        }
-
         $stmt->bind_param("ss", $subject_code, $subject_name);
-        
+
         if ($stmt->execute()) {
+           
+            $inserted_id = $stmt->insert_id;
             $_SESSION['subjects'][] = [
+                'id' => $inserted_id, 
                 'subject_code' => $subject_code,
                 'subject_name' => $subject_name
             ];
@@ -182,6 +181,61 @@ function addSubject($subject_code, $subject_name)
         'errors' => $errors
     ];
 }
+
+function editSubject($subject_code, $subject_name)
+{
+    global $conn;
+    
+
+    if (empty($subject_code) || empty($subject_name)) {
+        return [
+            'success' => false,
+            'errors' => ["<li>Subject Name is required.</li>"]
+        ];
+    }
+
+    $sql = "SELECT COUNT(*) FROM subjects WHERE (subject_code = ? OR subject_name = ?) AND subject_code != ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $subject_code, $subject_name, $subject_code);
+    $stmt->execute();
+    $stmt->bind_result($count);
+    $stmt->fetch();
+    $stmt->close();
+
+    if ($count > 0) {
+        return [
+            'success' => false,
+            'errors' => ["<li>Duplicate Subject Name.</li>"]
+        ];
+    }
+
+    $sql = "UPDATE subjects SET subject_name = ? WHERE subject_code = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $subject_name, $subject_code);
+    if ($stmt->execute()) {
+
+
+        foreach ($_SESSION['subjects'] as &$sub) {
+            if ($sub['subject_code'] == $subject_code) {
+                $sub['subject_name'] = $subject_name;
+                break;
+            }
+        }
+        $stmt->close();
+        return [
+            'success' => true,
+            'errors' => []
+        ];
+    } else {
+        $stmt->close();
+        return [
+            'success' => false,
+            'errors' => ["Failed to update subject in the database."]
+        ];
+    }
+}
+
+
 
 function getSubjectdash($conn)
 {
