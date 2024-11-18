@@ -356,6 +356,7 @@ function getStudentById($student_id) {
     return $result->fetch_assoc(); 
 }
 
+
 function updateStudent($student_id, $first_name, $last_name) {
     global $conn;
 
@@ -403,6 +404,82 @@ function deleteStudent($student_id) {
     }
 }
 
+function attachSubjectsToStudent($student_id, $subjects) {
+    global $conn;
+    $success = true;
+    $errors = [];
+
+    if (empty($subjects)) {
+        $errors[] = "At least one subject should be selected.";
+    } else {
+     
+        foreach ($subjects as $subject_code) {
+            $check_query = "SELECT * FROM students_subjects WHERE student_id = ? AND subject_id = (SELECT id FROM subjects WHERE subject_code = ?)";
+            $stmt = $conn->prepare($check_query);
+            $stmt->bind_param("is", $student_id, $subject_code);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+     
+                $errors[] = "Subject with code $subject_code is already attached to this student.";
+            } else {
+        
+                $insert_query = "INSERT INTO students_subjects (student_id, subject_id, grade) 
+                                 SELECT ?, id, 0.00 FROM subjects WHERE subject_code = ?";
+                $stmt = $conn->prepare($insert_query);
+                $stmt->bind_param("is", $student_id, $subject_code);
+                if (!$stmt->execute()) {
+                    $errors[] = "Failed to attach subject $subject_code.";
+                    $success = false;
+                }
+            }
+        }
+    }
+
+    return ['success' => $success, 'errors' => $errors];
+}
+
+
+function getSubjectsByStudentId($student_id) {
+    global $conn;
+
+    $subjects = [];
+
+    $sql = "SELECT s.subject_code, s.subject_name
+            FROM subjects s
+            INNER JOIN students_subjects ss ON s.id = ss.subject_id
+            WHERE ss.student_id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $student_id); 
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($subject = $result->fetch_assoc()) {
+        $subjects[] = $subject;
+    }
+
+    return $subjects;
+}
+
+function getAllSubjects() {
+    global $conn;
+
+    $subjects = [];
+
+    $sql = "SELECT subject_code, subject_name FROM subjects";
+    $result = $conn->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+        while ($subject = $result->fetch_assoc()) {
+            $subjects[] = $subject;
+        }
+    }
+
+    return $subjects;
+}
+
 
 function getStudentDash($conn)
 {
@@ -416,6 +493,7 @@ function getStudentDash($conn)
 
     return $studentCount; 
 }
+
 
 function renderErrorMessage($errorHtml)
 {

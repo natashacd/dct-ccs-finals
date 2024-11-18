@@ -1,4 +1,5 @@
 <?php
+$pagetitle = 'Dashboard';
 include './partials/header.php';
 include '../functions.php';
 

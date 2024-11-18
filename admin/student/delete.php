@@ -3,6 +3,7 @@ $pagetitle = 'Delete Student';
 include '../partials/header.php';
 
 include '../../functions.php'; 
+guard();
 
 $successMessage = '';
 $errorMessage = '';
