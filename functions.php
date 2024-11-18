@@ -481,6 +481,52 @@ function getAllSubjects() {
 }
 
 
+function detachSubjectFromStudent($student_id, $subject_code) {
+    global $conn; 
+
+    $query = "SELECT id FROM subjects WHERE subject_code = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('s', $subject_code);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $subject = $result->fetch_assoc();
+        $subject_id = $subject['id'];
+    } else {
+        return ['success' => false, 'errors' => ['Subject not found!']];
+    }
+
+
+    $query = "DELETE FROM students_subjects WHERE student_id = ? AND subject_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('ss', $student_id, $subject_id);
+    $stmt->execute();
+
+    if ($stmt->affected_rows > 0) {
+        return ['success' => true, 'message' => 'Subject successfully detached from student.'];
+    } else {
+        return ['success' => false, 'errors' => ['Subject not found for this student.']];
+    }
+}
+
+function getSubjectByCode($subject_code) {
+    global $conn;
+
+    $query = "SELECT * FROM subjects WHERE subject_code = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('s', $subject_code);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        return $result->fetch_assoc(); 
+    } else {
+        return null; 
+    }
+}
+
+
 function getStudentDash($conn)
 {
     $studentCount = 0; 
