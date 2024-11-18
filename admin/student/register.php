@@ -87,6 +87,7 @@ include '../partials/side-bar.php';
                                         <a href="edit.php?id=<?= htmlspecialchars($student['student_id']); ?>" class="btn btn-info btn-sm">Edit</a>
                                         <a href="delete.php?id=<?= htmlspecialchars($student['student_id']); ?>" class="btn btn-danger btn-sm">Delete</a>
                                         <a href="attach-subject.php?id=<?= htmlspecialchars($student['student_id']); ?>" class="btn btn-warning btn-sm">Attach Subject</a>
+
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
