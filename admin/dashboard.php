@@ -2,16 +2,15 @@
 $pagetitle = 'Dashboard';
 include './partials/header.php';
 include '../functions.php';
-
 guard();
 
 $_SESSION['page'] = '/admin/dashboard.php';
 $pagetitle = 'Dashboard';
 
-include './partials/side-bar.php';
 
 $subjectDash = getSubjectDash($conn);
 $studentDash = getStudentDash($conn); 
+include './partials/side-bar.php';
 ?>
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">    
