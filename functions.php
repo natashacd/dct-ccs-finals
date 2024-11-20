@@ -388,21 +388,30 @@ function updateStudent($student_id, $first_name, $last_name) {
 function deleteStudent($student_id) {
     global $conn;
 
-    $sql = "DELETE FROM students WHERE student_id = ?";
-
-    $stmt = $conn->prepare($sql);
-    
+    // First, delete the student's records from the 'students_subjects' table
+    $deleteSubjectsQuery = "DELETE FROM students_subjects WHERE student_id = ?";
+    $stmt = $conn->prepare($deleteSubjectsQuery);
     $stmt->bind_param("s", $student_id);
 
+    if (!$stmt->execute()) {
+        $stmt->close();
+        return false; // Return false if the deletion of student-subject relationships fails
+    }
+
+    // Now, delete the student record from the 'students' table
+    $deleteStudentQuery = "DELETE FROM students WHERE student_id = ?";
+    $stmt = $conn->prepare($deleteStudentQuery);
+    $stmt->bind_param("s", $student_id);
 
     if ($stmt->execute()) {
         $stmt->close();
-        return true; 
+        return true; // Return true if both deletions are successful
     } else {
         $stmt->close();
-        return false; 
+        return false; // Return false if deleting the student record fails
     }
 }
+
 
 function attachSubjectsToStudent($student_id, $subjects) {
     global $conn;
