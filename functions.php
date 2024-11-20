@@ -388,27 +388,25 @@ function updateStudent($student_id, $first_name, $last_name) {
 function deleteStudent($student_id) {
     global $conn;
 
-    // First, delete the student's records from the 'students_subjects' table
     $deleteSubjectsQuery = "DELETE FROM students_subjects WHERE student_id = ?";
     $stmt = $conn->prepare($deleteSubjectsQuery);
     $stmt->bind_param("s", $student_id);
 
     if (!$stmt->execute()) {
         $stmt->close();
-        return false; // Return false if the deletion of student-subject relationships fails
+        return false;
     }
 
-    // Now, delete the student record from the 'students' table
     $deleteStudentQuery = "DELETE FROM students WHERE student_id = ?";
     $stmt = $conn->prepare($deleteStudentQuery);
     $stmt->bind_param("s", $student_id);
 
     if ($stmt->execute()) {
         $stmt->close();
-        return true; // Return true if both deletions are successful
+        return true;
     } else {
         $stmt->close();
-        return false; // Return false if deleting the student record fails
+        return false;
     }
 }
 
@@ -421,23 +419,35 @@ function attachSubjectsToStudent($student_id, $subjects) {
     if (empty($subjects)) {
         $errors[] = "At least one subject should be selected.";
     } else {
-     
         foreach ($subjects as $subject_code) {
-            $check_query = "SELECT * FROM students_subjects WHERE student_id = ? AND subject_id = (SELECT id FROM subjects WHERE subject_code = ?)";
+
+            $subject_query = "SELECT id FROM subjects WHERE subject_code = ?";
+            $stmt = $conn->prepare($subject_query);
+            $stmt->bind_param("s", $subject_code);
+            $stmt->execute();
+            $subject_result = $stmt->get_result();
+
+            if ($subject_result->num_rows == 0) {
+
+                $errors[] = "Subject with code $subject_code does not exist.";
+                continue;
+            }
+
+            $subject = $subject_result->fetch_assoc();
+            $subject_id = $subject['id'];
+
+            $check_query = "SELECT * FROM students_subjects WHERE student_id = ? AND subject_id = ?";
             $stmt = $conn->prepare($check_query);
-            $stmt->bind_param("is", $student_id, $subject_code);
+            $stmt->bind_param("ii", $student_id, $subject_id);
             $stmt->execute();
             $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
-     
                 $errors[] = "Subject with code $subject_code is already attached to this student.";
             } else {
-        
-                $insert_query = "INSERT INTO students_subjects (student_id, subject_id, grade) 
-                                 SELECT ?, id, 0.00 FROM subjects WHERE subject_code = ?";
+                $insert_query = "INSERT INTO students_subjects (student_id, subject_id, grade) VALUES (?, ?, 0.00)";
                 $stmt = $conn->prepare($insert_query);
-                $stmt->bind_param("is", $student_id, $subject_code);
+                $stmt->bind_param("ii", $student_id, $subject_id);
                 if (!$stmt->execute()) {
                     $errors[] = "Failed to attach subject $subject_code.";
                     $success = false;
