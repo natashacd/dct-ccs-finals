@@ -6,12 +6,14 @@ guard();
 
 $errors = [];
 $successMessage = '';
-
+$student_id = '';
+$first_name = '';
+$last_name = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $student_id = $_POST['student_id'];
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
+    $student_id = htmlspecialchars($_POST['student_id']); // Preserve and sanitize input
+    $first_name = htmlspecialchars($_POST['first_name']);
+    $last_name = htmlspecialchars($_POST['last_name']);
 
     $result = registerStudent($student_id, $first_name, $last_name); 
 
@@ -46,17 +48,38 @@ include '../partials/side-bar.php';
             <div class="card p-5 mb-4">
                 <form action="register.php" method="POST">
                     <div class="mb-3 form-floating">
-                        <input type="text" id="studentId" name="student_id" class="form-control" placeholder="Student ID" >
+                        <input 
+                            type="text" 
+                            id="studentId" 
+                            name="student_id" 
+                            class="form-control" 
+                            placeholder="Student ID" 
+                            value="<?php echo $student_id; ?>" 
+                        >
                         <label for="studentId">Student ID</label>
                     </div>
                     
                     <div class="mb-3 form-floating">
-                        <input type="text" id="firstName" name="first_name" class="form-control" placeholder="First Name" >
+                        <input 
+                            type="text" 
+                            id="firstName" 
+                            name="first_name" 
+                            class="form-control" 
+                            placeholder="First Name" 
+                            value="<?php echo $first_name; ?>" 
+                        >
                         <label for="firstName">First Name</label>
                     </div>
                     
                     <div class="mb-3 form-floating">
-                        <input type="text" id="lastName" name="last_name" class="form-control" placeholder="Last Name" >
+                        <input 
+                            type="text" 
+                            id="lastName" 
+                            name="last_name" 
+                            class="form-control" 
+                            placeholder="Last Name" 
+                            value="<?php echo $last_name; ?>" 
+                        >
                         <label for="lastName">Last Name</label>
                     </div>
                     
@@ -77,7 +100,6 @@ include '../partials/side-bar.php';
                             </tr>
                         </thead>
                         <tbody>
-
                             <?php foreach ($students as $student): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($student['student_id']); ?></td>
@@ -87,7 +109,6 @@ include '../partials/side-bar.php';
                                         <a href="edit.php?id=<?= htmlspecialchars($student['student_id']); ?>" class="btn btn-info btn-sm">Edit</a>
                                         <a href="delete.php?id=<?= htmlspecialchars($student['student_id']); ?>" class="btn btn-danger btn-sm">Delete</a>
                                         <a href="attach-subject.php?id=<?= htmlspecialchars($student['student_id']); ?>" class="btn btn-warning btn-sm">Attach Subject</a>
-
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
