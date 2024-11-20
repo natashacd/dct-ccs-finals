@@ -95,42 +95,45 @@ include '../partials/side-bar.php';
                 </form>
             </div>
         </div>
-        <div class="card mt-5">
-            <div class="card-header">
-                Subject List
-            </div>
-            <div class="card-body p-5">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Subject Code</th>
-                            <th>Subject Name</th>
-                            <th>Grade</th>
-                            <th>Option</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                    if (!empty($student_subjects)) {
-                        foreach ($student_subjects as $subject) {
-                            echo "<tr>";
-                            echo "<td>" . htmlspecialchars($subject['subject_code']) . "</td>";
-                            echo "<td>" . htmlspecialchars($subject['subject_name']) . "</td>";
-                            echo "<td></td>";
-                            echo "<td>
-                                <a href='dettach-subject.php?id=" . htmlspecialchars($student['student_id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-danger btn-sm'>Detach Subject</a>
-                                <a href='assign-grade.php?id=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-success btn-sm'>Assign Grade</a>
-                            </td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='4'>No subjects attached to this student.</td></tr>";
-                    }
-                    ?>
+        <div class="card-body p-5">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Grade</th>
+                <th>Option</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php
+        foreach ($student_subjects as $subject) {
+            echo "<tr>";
+            echo "<td>" . htmlspecialchars($subject['subject_code']) . "</td>";
+            echo "<td>" . htmlspecialchars($subject['subject_name']) . "</td>";
+        
+            // Fetch grade for the subject
+            $grade_sql = "SELECT grade FROM students_subjects WHERE student_id = ? AND subject_id = (SELECT id FROM subjects WHERE subject_code = ?)";
+            $stmt = $conn->prepare($grade_sql);
+            $stmt->bind_param("is", $student_id, $subject['subject_code']);
+            $stmt->execute();
+            $stmt->store_result();  // Store the result before binding and fetching
+            
+            $stmt->bind_result($grade);
+            $stmt->fetch();
+        
+            echo "<td>" . ($grade !== null ? htmlspecialchars($grade) : "Not Assigned") . "</td>";
+            echo "<td>
+                    <a href='dettach-subject.php?id=" . htmlspecialchars($student['student_id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-danger btn-sm'>Detach Subject</a>
+                    <a href='assign-grade.php?id=" . htmlspecialchars($student['student_id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-success btn-sm'>Assign Grade</a>
+                </td>";
+            echo "</tr>";
+        }
+        ?>
 
-                    </tbody>
-                </table>
-            </div>
+        </tbody>
+    </table>
+</div>
         </div>
     </div>
 </main>

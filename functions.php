@@ -480,7 +480,6 @@ function getAllSubjects() {
     return $subjects;
 }
 
-
 function detachSubjectFromStudent($student_id, $subject_code) {
     global $conn; 
 
@@ -510,23 +509,6 @@ function detachSubjectFromStudent($student_id, $subject_code) {
     }
 }
 
-function getSubjectByCode($subject_code) {
-    global $conn;
-
-    $query = "SELECT * FROM subjects WHERE subject_code = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param('s', $subject_code);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        return $result->fetch_assoc(); 
-    } else {
-        return null; 
-    }
-}
-
-
 function getStudentDash($conn)
 {
     $studentCount = 0; 
@@ -539,7 +521,61 @@ function getStudentDash($conn)
 
     return $studentCount; 
 }
+function assignGradeToSubject($student_id, $subject_code, $grade) {
+    global $conn;
+    if ($grade < 65 || $grade > 100) {
+        return [
+            'success' => false,
+            'errors' => ["Grade must be between 65 and 100."]
+        ];
+    }
 
+    $sql = "SELECT ss.id FROM students_subjects ss 
+            JOIN subjects s ON ss.subject_id = s.id
+            WHERE ss.student_id = ? AND s.subject_code = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("is", $student_id, $subject_code);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        $update_sql = "UPDATE students_subjects SET grade = ? WHERE student_id = ? AND subject_id = (SELECT id FROM subjects WHERE subject_code = ?)";
+        $stmt = $conn->prepare($update_sql);
+        $stmt->bind_param("dis", $grade, $student_id, $subject_code);
+
+        if ($stmt->execute()) {
+            return [
+                'success' => true,
+                'errors' => []
+            ];
+        } else {
+            return [
+                'success' => false,
+                'errors' => ["Failed to update grade."]
+            ];
+        }
+    } else {
+        return [
+            'success' => false,
+            'errors' => ["Subject not attached to this student."]
+        ];
+    }
+}
+
+function getSubjectByCode($subject_code) {
+    global $conn;
+
+    $sql = "SELECT subject_code, subject_name FROM subjects WHERE subject_code = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $subject_code);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($subject = $result->fetch_assoc()) {
+        return $subject;
+    } else {
+        return null; 
+    }
+}
 
 function renderErrorMessage($errorHtml)
 {
