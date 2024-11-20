@@ -577,6 +577,59 @@ function getSubjectByCode($subject_code) {
     }
 }
 
+function getPassFailCount($conn) {
+    $query = "
+        SELECT 
+            student_id,
+            AVG(grade) AS average_grade,
+            CASE 
+                WHEN AVG(grade) >= 75 THEN 'Passed'
+                ELSE 'Failed'
+            END AS status
+        FROM 
+            students_subjects
+        GROUP BY 
+            student_id;
+    ";
+
+    $result = $conn->query($query);
+
+
+    $passedCount = 0;
+    $failedCount = 0;
+
+    if ($result->num_rows > 0) {
+        $counts = [];
+        while ($row = $result->fetch_assoc()) {
+
+            $counts[] = [
+                'student_id' => $row['student_id'],
+                'average_grade' => $row['average_grade'],
+                'status' => $row['status']
+            ];
+
+            if ($row['status'] == 'Passed') {
+                $passedCount++;
+            } else {
+                $failedCount++;
+            }
+        }
+
+        return [
+            'students' => $counts,
+            'passed' => $passedCount, 
+            'failed' => $failedCount
+        ];
+    } else {
+        return [
+            'students' => [],
+            'passed' => 0,
+            'failed' => 0
+        ];
+    }
+}
+
+
 function renderErrorMessage($errorHtml)
 {
     if (!empty($errorHtml)) {

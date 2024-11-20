@@ -4,9 +4,8 @@ include './partials/header.php';
 include '../functions.php';
 guard();
 
-$_SESSION['page'] = '/admin/dashboard.php';
-$pagetitle = 'Dashboard';
 
+$passFailCounts = getPassFailCount($conn);
 
 $subjectDash = getSubjectDash($conn);
 $studentDash = getStudentDash($conn); 
@@ -15,7 +14,7 @@ include './partials/side-bar.php';
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">    
     <h1 class="h2">Dashboard</h1>        
-    
+
     <div class="row mt-5">
         <div class="col-12 col-xl-3">
             <div class="card border-primary mb-3">
@@ -37,7 +36,7 @@ include './partials/side-bar.php';
             <div class="card border-danger mb-3">
                 <div class="card-header bg-danger text-white border-danger">Number of Failed Students:</div>
                 <div class="card-body text-danger">
-                    <h5 class="card-title">0</h5> <!-- You can implement the failed count similarly -->
+                    <h5 class="card-title"><?php echo $passFailCounts['failed']; ?></h5> <!-- Display the number of failed students -->
                 </div>
             </div>
         </div>
@@ -45,12 +44,13 @@ include './partials/side-bar.php';
             <div class="card border-success mb-3">
                 <div class="card-header bg-success text-white border-success">Number of Passed Students:</div>
                 <div class="card-body text-success">
-                    <h5 class="card-title">0</h5> <!-- You can implement the passed count similarly -->
+                    <h5 class="card-title"><?php echo $passFailCounts['passed']; ?></h5> <!-- Display the number of passed students -->
                 </div>
             </div>
         </div>
     </div>    
 </main>
+
 <?php
 include './partials/footer.php';
 ?>
