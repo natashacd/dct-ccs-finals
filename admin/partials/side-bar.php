@@ -7,25 +7,28 @@
         <div class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="/admin/dashboard.php">
+                    <a class="nav-link d-flex align-items-center gap-2" href="/admin/dashboard.php" 
+                    style="<?php echo (basename($_SERVER['PHP_SELF']) == 'dashboard.php') ? 'font-weight: bold;' : ''; ?>">
                         <i class="fa-solid fa-gauge fa-fw me-2"></i>
                         Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="/admin/subject/add.php">
-                    <i class="fa-solid fa-file fa-fw me-2"></i>
+                    <a class="nav-link d-flex align-items-center gap-2" href="/admin/subject/add.php"
+                    style="<?php echo (basename($_SERVER['PHP_SELF']) == 'add.php') ? 'font-weight: bold;' : ''; ?>">
+                        <i class="fa-solid fa-file fa-fw me-2"></i>
                         Subjects
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="/admin/student/register.php">
+                    <a class="nav-link d-flex align-items-center gap-2" href="/admin/student/register.php"
+                    style="<?php echo (basename($_SERVER['PHP_SELF']) == 'register.php') ? 'font-weight: bold;' : ''; ?>">
                         <i class="fa-solid fa-user fa-fw me-2"></i>
                         Students
                     </a>
-                </li>                
+                </li>
             </ul>
-           
+
             <hr class="my-3">
 
             <ul class="nav flex-column mb-auto">
