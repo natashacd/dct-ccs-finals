@@ -61,7 +61,7 @@ include '../partials/side-bar.php';
                     <hr>
                     <form method="POST">
                     <div class="mb-3 form-floating">
-                    <input type="number" class="form-control" id="grade" name="grade" placeholder="Grade" >
+                    <input type="number" class="form-control" id="grade" name="grade" placeholder="Grade" value = "0.00" autofocus>
                      <label for="grade">Grade</label>
                     </div>
                     <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancel</button>

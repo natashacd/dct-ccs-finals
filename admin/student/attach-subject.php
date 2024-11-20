@@ -64,40 +64,42 @@ include '../partials/side-bar.php';
             echo renderErrorMessage(implode('<br>', $result['errors'])); 
         }
         ?>
-
-        <div class="card p-4">
-            <div class="card-body">
-                <h4 class="mb-4">Selected Student Information</h4>
-                <ul>
-                    <?php if ($student): ?>
-                        <li class="ml-4"><strong>Student ID:</strong> <?php echo htmlspecialchars($student['student_id']); ?></li>
-                        <li><strong>Name:</strong> <?php echo htmlspecialchars($student['first_name']) . ' ' . htmlspecialchars($student['last_name']); ?></li>
-                    <?php else: ?>
-                        <li><strong>No student information available.</strong></li>
-                    <?php endif; ?>
-                </ul>
-                <hr>
-                <form action="attach-subject.php?id=<?php echo urlencode($student_id); ?>" method="POST">
-                    <h5>Select Subjects to Attach:</h5>
-                    <?php
-                    if (!empty($available_subjects)) {
-                        foreach ($available_subjects as $subject) {
-                            echo "<div class='form-check'>
-                                    <input class='form-check-input' type='checkbox' name='subjects[]' value='" . $subject['subject_code'] . "' id='subject" . $subject['subject_code'] . "'>
-                                    <label class='form-check-label' for='subject" . $subject['subject_code'] . "'>" . htmlspecialchars($subject['subject_name']) . "</label>
-                                  </div>";
+            <div class="card p-4">
+                <div class="card-body">
+                    <h4 class="mb-4">Selected Student Information</h4>
+                    <ul>
+                        <?php if ($student): ?>
+                            <li class="ml-4"><strong>Student ID:</strong> <?php echo htmlspecialchars($student['student_id']); ?></li>
+                            <li><strong>Name:</strong> <?php echo htmlspecialchars($student['first_name']) . ' ' . htmlspecialchars($student['last_name']); ?></li>
+                        <?php else: ?>
+                            <li><strong>No student information available.</strong></li>
+                        <?php endif; ?>
+                    </ul>
+                    <hr>
+                    <form action="attach-subject.php?id=<?php echo urlencode($student_id); ?>" method="POST">
+                        <h5>Select Subjects to Attach:</h5>
+                        <?php
+                        if (!empty($available_subjects)) {
+                            foreach ($available_subjects as $subject) {
+                                echo "<div class='form-check'>
+                                        <input class='form-check-input' type='checkbox' name='subjects[]' value='" . $subject['subject_code'] . "' id='subject" . $subject['subject_code'] . "'>
+                                        <label class='form-check-label' for='subject" . $subject['subject_code'] . "'>" . htmlspecialchars($subject['subject_name']) . "</label>
+                                    </div>";
+                            }
+                            echo "<button type='submit' class='btn btn-primary mt-3'>Attach Subjects</button>";
+                        } 
+                        else {
+                            echo "<p>No subjects to attach.</p>";
                         }
-                    } else {
-                        echo "<p>No available subjects to select.</p>";
-                    }
-                    ?>
-                    <button type="submit" class="btn btn-primary mt-3">Attach Subjects</button>
-                </form>
+                        ?>
+                    </form>
+                </div>
             </div>
-        </div>
-        <div class="card-body p-5">
-    <table class="table table-striped">
-        <thead>
+            <div class="card mt-5">
+            <h4 class="p-3 pl-4 m-0">Subject List</h4>
+            <div class="card-body pt-2 pl-4">
+        <table class="table table-striped">
+            <thead>
             <tr>
                 <th>Subject Code</th>
                 <th>Subject Name</th>
@@ -135,6 +137,7 @@ include '../partials/side-bar.php';
     </table>
 </div>
         </div>
+    </div>
     </div>
 </main>
 
