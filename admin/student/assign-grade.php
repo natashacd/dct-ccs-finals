@@ -13,9 +13,7 @@ if (isset($_GET['id']) && isset($_GET['subject_code'])) {
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $grade = isset($_POST['grade']) ? $_POST['grade'] : null;
-    
         if ($grade === null || !is_numeric($grade) || $grade < 65 || $grade > 100) {
-
             $result['errors'][] = "Grade should be between 65 to 100.";
         } else {
             $result = assignGradeToSubject($student_id, $subject_code, $grade);
@@ -23,6 +21,8 @@ if (isset($_GET['id']) && isset($_GET['subject_code'])) {
             if ($result['success']) {
                 header("Location: attach-subject.php?id=" . urlencode($student_id));
                 exit;
+            } else {
+                $result['errors'][] = "Failed to assign grade. Please try again.";
             }
         }
     }

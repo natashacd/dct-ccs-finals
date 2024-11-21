@@ -8,8 +8,24 @@ $database = 'dct-ccs-finals';
 
 $conn = new mysqli($host, $user, $password, $database);
 
+function coonectDB(){
+    
+$host = 'localhost';
+$user = 'root';
+$password = '';
+$database = 'dct-ccs-finals';
+
+$conn = new mysqli($host, $user, $password, $database);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+return $conn;
+
 if ($conn->connect_error) {
     die("Connection Failed: . $conn->connect_error");
+}
+
 }
 
 function guard()
@@ -291,9 +307,9 @@ function registerStudent($student_id, $first_name, $last_name)
     }
 
 
-    $sql = "SELECT COUNT(*) FROM students WHERE student_id = ?";
+    $sql = "SELECT COUNT(*) FROM students WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $student_id);
+    $stmt->bind_param("i", $student_id);
     $stmt->execute();
     $stmt->bind_result($count);
     $stmt->fetch();
@@ -331,7 +347,7 @@ function getStudents() {
 
     $students = [];
 
-    $sql = "SELECT student_id, first_name, last_name FROM students"; 
+    $sql = "SELECT id, student_id, first_name, last_name FROM students"; 
 
 
     $result = $conn->query($sql);
@@ -346,70 +362,107 @@ function getStudents() {
     return $students; 
 }
 
+
 function getStudentById($student_id) {
     global $conn;
-    $sql = "SELECT student_id, first_name, last_name FROM students WHERE student_id = ?";
+    $sql = "SELECT student_id, first_name, last_name FROM students WHERE id = ? ";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $student_id);
+    $stmt->bind_param('i', $student_id); 
     $stmt->execute();
     $result = $stmt->get_result();
     return $result->fetch_assoc(); 
 }
 
 
+function getStudentById1($student_id) {
+    global $conn;
+    $sql = "SELECT student_id, first_name, last_name FROM students WHERE student_id = ? ";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('s', $student_id); 
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc(); 
+}
+
+function ids($student_id) {
+    global $conn;
+
+    $sql = "SELECT student_id, first_name, last_name FROM students WHERE student_id = ?";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die("Database error: " . $conn->error);
+    }
+    $stmt->bind_param('i', $student_id); 
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $student = $result->fetch_assoc();
+
+    
+    if (!$student) {
+        echo "No student found with ID: " . $student_id;
+    }
+
+    return $student ?: null;
+}
+
 function updateStudent($student_id, $first_name, $last_name) {
     global $conn;
 
-
     if (empty($first_name) || empty($last_name)) {
         return [
-            'success' => false,
-            'errors' => ["<li>First Name is required.</li><li>Last Name is required.</li>"]
+            'success' => false, 
+            'errors' => ['<li>First Name is required.</li><li>Last Name is required.</li>']
         ];
     }
 
+
     $sql = "UPDATE students SET first_name = ?, last_name = ? WHERE student_id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $first_name, $last_name, $student_id);
 
-    if ($stmt->execute()) {
-        return [
-            'success' => true,
-            'errors' => []
-        ];
+    if (!$stmt) {
+        return ['success' => false, 'errors' => ['Database error: ' . $conn->error]];
+    }
+
+    $stmt->bind_param('ssi', $first_name, $last_name, $student_id);
+    $stmt->execute();
+
+    if ($stmt->affected_rows > 0) {
+        return ['success' => true];
     } else {
-        return [
-            'success' => false,
-            'errors' => ["Failed to update student."]
-        ];
+        return ['success' => false, 'errors' => ['No changes were made to the student record.']];
     }
 }
 
 function deleteStudent($student_id) {
     global $conn;
+    $conn->begin_transaction();
 
-    $deleteSubjectsQuery = "DELETE FROM students_subjects WHERE student_id = ?";
-    $stmt = $conn->prepare($deleteSubjectsQuery);
-    $stmt->bind_param("s", $student_id);
+    try {
 
-    if (!$stmt->execute()) {
-        $stmt->close();
-        return false;
-    }
+        $deleteSubjectsQuery = "DELETE FROM students_subjects WHERE student_id = ?";
+        $stmt = $conn->prepare($deleteSubjectsQuery);
+        $stmt->bind_param("i", $student_id);
 
-    $deleteStudentQuery = "DELETE FROM students WHERE student_id = ?";
-    $stmt = $conn->prepare($deleteStudentQuery);
-    $stmt->bind_param("s", $student_id);
+        if (!$stmt->execute()) {
+            throw new Exception("Error deleting from students_subjects: " . $stmt->error);
+        }
 
-    if ($stmt->execute()) {
-        $stmt->close();
+        $deleteStudentQuery = "DELETE FROM students WHERE student_id = ?";
+        $stmt = $conn->prepare($deleteStudentQuery);
+        $stmt->bind_param("i", $student_id);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Error deleting from students: " . $stmt->error);
+        }
+        $conn->commit();
         return true;
-    } else {
-        $stmt->close();
+    } catch (Exception $e) {
+
+        $conn->rollback();
+        error_log($e->getMessage());
         return false;
     }
 }
-
 
 function attachSubjectsToStudent($student_id, $subjects) {
     global $conn;
@@ -460,6 +513,8 @@ function attachSubjectsToStudent($student_id, $subjects) {
 }
 
 
+
+
 function getSubjectsByStudentId($student_id) {
     global $conn;
 
@@ -487,7 +542,7 @@ function getAllSubjects() {
 
     $subjects = [];
 
-    $sql = "SELECT subject_code, subject_name FROM subjects";
+    $sql = "SELECT id,subject_code, subject_name FROM subjects";
     $result = $conn->query($sql);
 
     if ($result && $result->num_rows > 0) {
@@ -498,16 +553,19 @@ function getAllSubjects() {
 
     return $subjects;
 }
-
 function detachSubjectFromStudent($student_id, $subject_code) {
-    global $conn; 
+    global $conn;
 
     $query = "SELECT id FROM subjects WHERE subject_code = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param('s', $subject_code);
     $stmt->execute();
-    $result = $stmt->get_result();
 
+    if ($stmt->error) {
+        return ['success' => false, 'errors' => ['Query error: ' . $stmt->error]];
+    }
+
+    $result = $stmt->get_result();
     if ($result->num_rows > 0) {
         $subject = $result->fetch_assoc();
         $subject_id = $subject['id'];
@@ -515,18 +573,18 @@ function detachSubjectFromStudent($student_id, $subject_code) {
         return ['success' => false, 'errors' => ['Subject not found!']];
     }
 
-
     $query = "DELETE FROM students_subjects WHERE student_id = ? AND subject_id = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('ss', $student_id, $subject_id);
+    $stmt->bind_param('ii', $student_id, $subject_id);
     $stmt->execute();
 
     if ($stmt->affected_rows > 0) {
         return ['success' => true, 'message' => 'Subject successfully detached from student.'];
     } else {
-        return ['success' => false, 'errors' => ['Subject not found for this student.']];
+        return ['success' => false, 'errors' => ['No rows were affected. Subject might not be assigned to this student.']];
     }
 }
+
 
 function getStudentDash($conn)
 {
@@ -552,6 +610,7 @@ function assignGradeToSubject($student_id, $subject_code, $grade) {
     $sql = "SELECT ss.id FROM students_subjects ss 
             JOIN subjects s ON ss.subject_id = s.id
             WHERE ss.student_id = ? AND s.subject_code = ?";
+    
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("is", $student_id, $subject_code);
     $stmt->execute();
@@ -560,7 +619,7 @@ function assignGradeToSubject($student_id, $subject_code, $grade) {
     if ($stmt->num_rows > 0) {
         $update_sql = "UPDATE students_subjects SET grade = ? WHERE student_id = ? AND subject_id = (SELECT id FROM subjects WHERE subject_code = ?)";
         $stmt = $conn->prepare($update_sql);
-        $stmt->bind_param("dis", $grade, $student_id, $subject_code);
+        $stmt->bind_param("dis", $grade, $student_id, $subject_code); 
 
         if ($stmt->execute()) {
             return [
@@ -584,9 +643,9 @@ function assignGradeToSubject($student_id, $subject_code, $grade) {
 function getSubjectByCode($subject_code) {
     global $conn;
 
-    $sql = "SELECT subject_code, subject_name FROM subjects WHERE subject_code = ?";
+    $sql = "SELECT * FROM subjects WHERE subject_code = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $subject_code);
+    $stmt->bind_param("i", $subject_code);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($subject = $result->fetch_assoc()) {
@@ -598,17 +657,19 @@ function getSubjectByCode($subject_code) {
 
 function getPassFailCount($conn) {
     $query = "
-        SELECT 
-            student_id,
-            AVG(grade) AS average_grade,
+           SELECT 
+            `student_id`,
+            AVG(`grade`) AS `average_grade`,
             CASE 
-                WHEN AVG(grade) >= 75 THEN 'Passed'
+                WHEN AVG(`grade`) >= 75 THEN 'Passed'
                 ELSE 'Failed'
-            END AS status
+            END AS `status`
         FROM 
-            students_subjects
+            `students_subjects`
+        WHERE 
+            `grade` >= 65 -- Only consider grades 65 and above
         GROUP BY 
-            student_id;
+            `student_id`;
     ";
 
     $result = $conn->query($query);

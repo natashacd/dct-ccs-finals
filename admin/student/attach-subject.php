@@ -8,8 +8,8 @@ $result = ['success' => false, 'errors' => []];
 $student = null; 
 
 if (isset($_GET['id'])) {
-    $student_id = $_GET['id'];
-
+    $student_id = $_GET['id'];  
+}
 
     $student = getStudentById($student_id);  
 
@@ -18,9 +18,7 @@ if (isset($_GET['id'])) {
         exit;
     }
 
-
     $student_subjects = getSubjectsByStudentId($student_id); 
-
 
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($student_id)) {
         $selected_subjects = isset($_POST['subjects']) ? $_POST['subjects'] : [];
@@ -44,7 +42,7 @@ if (isset($_GET['id'])) {
         return !in_array($subject['subject_code'], array_column($student_subjects, 'subject_code'));
     });
     $available_subjects = array_values($available_subjects); 
-}
+
 include '../partials/side-bar.php';
 ?>
 
@@ -107,27 +105,26 @@ include '../partials/side-bar.php';
                 <th>Option</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody> 
         <?php
         foreach ($student_subjects as $subject) {
             echo "<tr>";
             echo "<td>" . htmlspecialchars($subject['subject_code']) . "</td>";
             echo "<td>" . htmlspecialchars($subject['subject_name']) . "</td>";
         
-            // Fetch grade for the subject
             $grade_sql = "SELECT grade FROM students_subjects WHERE student_id = ? AND subject_id = (SELECT id FROM subjects WHERE subject_code = ?)";
             $stmt = $conn->prepare($grade_sql);
             $stmt->bind_param("is", $student_id, $subject['subject_code']);
             $stmt->execute();
-            $stmt->store_result();  // Store the result before binding and fetching
+            $stmt->store_result(); 
             
             $stmt->bind_result($grade);
             $stmt->fetch();
         
             echo "<td>" . ($grade !== null ? htmlspecialchars($grade) : "Not Assigned") . "</td>";
             echo "<td>
-                    <a href='dettach-subject.php?id=" . htmlspecialchars($student['student_id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-danger btn-sm'>Detach Subject</a>
-                    <a href='assign-grade.php?id=" . htmlspecialchars($student['student_id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-success btn-sm'>Assign Grade</a>
+                    <a href='dettach-subject.php?id=" . urlencode($student_id) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-danger btn-sm'>Detach Subject</a>
+                    <a href='assign-grade.php?id=" .  urlencode($student_id). "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-success btn-sm'>Assign Grade</a>
                 </td>";
             echo "</tr>";
         }

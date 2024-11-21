@@ -3,13 +3,12 @@ include 'functions.php';
 returnPage();
 
 $errorHtml = '';
-$email = ''; // Initialize email to an empty string
+$email = ''; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = htmlspecialchars($_POST['email']); // Sanitize input
+    $email = htmlspecialchars($_POST['email']); 
     $password = md5($_POST['password']);
 
-    // Validate login credentials and get error messages if any
     $errorHtml = validateLoginCredentials($email, $password);
 }
 ?>

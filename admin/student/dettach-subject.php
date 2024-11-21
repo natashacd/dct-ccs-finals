@@ -1,5 +1,5 @@
 <?php
-$pagetitle = 'Detach Subject';
+$pagetitle = 'Dettach Subject';
 include '../partials/header.php';
 include '../../functions.php';
 guard();
