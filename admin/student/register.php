@@ -11,7 +11,7 @@ $first_name = '';
 $last_name = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $student_id = htmlspecialchars($_POST['student_id']); // Preserve and sanitize input
+    $student_id = htmlspecialchars($_POST['student_id']); 
     $first_name = htmlspecialchars($_POST['first_name']);
     $last_name = htmlspecialchars($_POST['last_name']);
 
@@ -108,7 +108,7 @@ include '../partials/side-bar.php';
                                     <td>
                                         <a href="edit.php?id=<?= htmlspecialchars($student['student_id']); ?>" class="btn btn-info btn-sm">Edit</a>
                                         <a href="delete.php?id=<?= htmlspecialchars($student['student_id']); ?>" class="btn btn-danger btn-sm">Delete</a>
-                                        <a href="attach-subject.php?id=<?= htmlspecialchars($student['student_id']); ?>" class="btn btn-warning btn-sm">Attach Subject</a>
+                                        <a href="attach-subject.php?id=<?= htmlspecialchars($student['id']); ?>" class="btn btn-warning btn-sm">Attach Subject</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
