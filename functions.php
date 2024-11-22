@@ -8,7 +8,6 @@ $database = 'dct-ccs-finals';
 
 $conn = new mysqli($host, $user, $password, $database);
 
-function coonectDB(){
     
 $host = 'localhost';
 $user = 'root';
@@ -26,7 +25,7 @@ if ($conn->connect_error) {
     die("Connection Failed: . $conn->connect_error");
 }
 
-}
+
 
 function guard()
 {
@@ -255,6 +254,18 @@ function deleteSubject($subject_code)
 {
     global $conn;
 
+    $deleteStudentsSubjectsQuery = "DELETE FROM students_subjects WHERE subject_id = (SELECT id FROM subjects WHERE subject_code = ?)";
+    $stmt = $conn->prepare($deleteStudentsSubjectsQuery);
+    $stmt->bind_param("s", $subject_code);
+
+    if (!$stmt->execute()) {
+        $stmt->close();
+        return [
+            'success' => false,
+            'errors' => ["Failed to delete the subject from students_subjects table."]
+        ];
+    }
+
     $sql = "DELETE FROM subjects WHERE subject_code = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $subject_code);
@@ -267,6 +278,7 @@ function deleteSubject($subject_code)
                 break;
             }
         }
+
         $stmt->close();
         return [
             'success' => true,
@@ -298,7 +310,7 @@ function registerStudent($student_id, $first_name, $last_name)
 {
     global $conn;
 
-
+    // Validate input fields
     if (empty($student_id) || empty($first_name) || empty($last_name)) {
         return [
             'success' => false,
@@ -306,10 +318,9 @@ function registerStudent($student_id, $first_name, $last_name)
         ];
     }
 
-
-    $sql = "SELECT COUNT(*) FROM students WHERE id = ?";
+    $sql = "SELECT COUNT(*) FROM students WHERE student_id = ?";  
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $student_id);
+    $stmt->bind_param("s", $student_id);
     $stmt->execute();
     $stmt->bind_result($count);
     $stmt->fetch();
@@ -324,7 +335,7 @@ function registerStudent($student_id, $first_name, $last_name)
 
     $sql = "INSERT INTO students (student_id, first_name, last_name) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $student_id, $first_name, $last_name);
+    $stmt->bind_param("sss", $student_id, $first_name, $last_name);  
     if ($stmt->execute()) {
         $stmt->close();
         return [
@@ -335,10 +346,11 @@ function registerStudent($student_id, $first_name, $last_name)
         $stmt->close();
         return [
             'success' => false,
-            'errors' => ["<li>Failed to register student.</li>"]
+            'errors' => ["<li>Failed to register student. Please try again later.</li>"]
         ];
     }
 }
+
 
 
 function getStudents() {
@@ -365,7 +377,7 @@ function getStudents() {
 
 function getStudentById($student_id) {
     global $conn;
-    $sql = "SELECT student_id, first_name, last_name FROM students WHERE id = ? ";
+    $sql = "SELECT student_id, first_name, last_name FROM students WHERE student_id = ? ";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $student_id); 
     $stmt->execute();
@@ -433,36 +445,97 @@ function updateStudent($student_id, $first_name, $last_name) {
     }
 }
 
+
+
+//apin ni itang delete student?wa
+//try kepa i comment
+
+// function deleteStudent($student_id) {
+//     $dsn = 'mysql:host=localhost;dbname=dct-ccs-finals'; // Replace 'your_database_name' with your database name
+//     $username = 'root';
+//     $password = '';
+ 
+//     try {
+//         $pdo = new PDO($dsn, $username, $password);
+//         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+ 
+//         // Begin transaction
+//         $pdo->beginTransaction();
+ 
+//         // Delete from students_subjects
+//         $deleteSubjectsQuery = "DELETE FROM students_subjects WHERE student_id = ?";
+        
+
+//         $stmt = $pdo->prepare($deleteSubjectsQuery);
+//         if (!$stmt->execute([($student_id])) {
+//             throw new Exception("Error deleting from students_subjects");
+//         }
+ 
+//         // Delete from students
+//         $deleteStudentQuery = "DELETE FROM students WHERE student_id = ?";
+//         $stmt = $pdo->prepare($deleteStudentQuery);
+//         if (!$stmt->execute([$student_id])) {
+//             throw new Exception("Error deleting from students");
+//         }
+ 
+//         // Commit the transaction
+//         $pdo->commit();
+//         return true;
+ 
+//     } catch (Exception $e) {
+//         // Rollback the transaction on error
+//         if (isset($pdo)) {
+//             $pdo->rollBack();
+//         }
+//         error_log($e->getMessage());
+//         return false;
+//     }
+// }
+
 function deleteStudent($student_id) {
-    global $conn;
+    global $conn; // Use the existing mysqli connection
+    
+    // Begin transaction
     $conn->begin_transaction();
 
     try {
-
+        // Delete from students_subjects
         $deleteSubjectsQuery = "DELETE FROM students_subjects WHERE student_id = ?";
         $stmt = $conn->prepare($deleteSubjectsQuery);
-        $stmt->bind_param("i", $student_id);
-
+        if (!$stmt) {
+            throw new Exception("Failed to prepare statement for students_subjects: " . $conn->error);
+        }
+        $stmt->bind_param("i", $student_id); // Bind student_id as an integer
         if (!$stmt->execute()) {
             throw new Exception("Error deleting from students_subjects: " . $stmt->error);
         }
+        $stmt->close();
 
+        // Delete from students
         $deleteStudentQuery = "DELETE FROM students WHERE student_id = ?";
         $stmt = $conn->prepare($deleteStudentQuery);
-        $stmt->bind_param("i", $student_id);
-
+        if (!$stmt) {
+            throw new Exception("Failed to prepare statement for students: " . $conn->error);
+        }
+        $stmt->bind_param("i", $student_id); // Bind student_id as an integer
         if (!$stmt->execute()) {
             throw new Exception("Error deleting from students: " . $stmt->error);
         }
+        $stmt->close();
+
+        // Commit the transaction
         $conn->commit();
         return true;
-    } catch (Exception $e) {
 
+    } catch (Exception $e) {
+        // Rollback the transaction on error
         $conn->rollback();
         error_log($e->getMessage());
         return false;
     }
 }
+
+
 
 function attachSubjectsToStudent($student_id, $subjects) {
     global $conn;
