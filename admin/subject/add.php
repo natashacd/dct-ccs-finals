@@ -1,6 +1,5 @@
 <?php
-$pagetitle = 'Subject';
-include '../partials/header.php';
+
 include '../../functions.php';
 guard();
 
@@ -27,7 +26,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 }
-
+$pagetitle = 'Subject';
+include '../partials/header.php';
 include '../partials/side-bar.php';
 ?>
 
@@ -46,7 +46,7 @@ include '../partials/side-bar.php';
             <div class="card p-5 mb-4">
                 <form action="add.php" method="POST">
                     <div class="mb-3 form-floating">
-                        <input type="text" id="subjectCode" name="subject_code" class="form-control " placeholder="Subject Code" value="<?= htmlspecialchars($subject_code); ?>">
+                        <input type="text" id="subjectCode" maxlength="4" name="subject_code" class="form-control " placeholder="Subject Code" value="<?= htmlspecialchars($subject_code); ?>">
                         <label for="subjectCode">Subject Code</label>
                     </div>
 
