@@ -1,6 +1,4 @@
 <?php
-$pagetitle = 'Dashboard';
-include './partials/header.php';
 include '../functions.php';
 guard();
 
@@ -9,6 +7,7 @@ $passFailCounts = getPassFailCount($conn);
 
 $subjectDash = getSubjectDash($conn);
 $studentDash = getStudentDash($conn); 
+include './partials/header.php';
 include './partials/side-bar.php';
 ?>
 

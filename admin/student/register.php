@@ -1,6 +1,5 @@
 <?php
-$pagetitle = 'Register';
-include '../partials/header.php';
+
 include '../../functions.php'; 
 guard();
 
@@ -28,10 +27,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 $students = getStudents(); 
 
+$pagetitle = 'Register';
+include '../partials/header.php';
 include '../partials/side-bar.php';
 ?>
 
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">    
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">       
     <div class="d-flex">
         <div class="content flex-grow-1 p-10">
             <h2 class="mb-5">Register a New Student</h2>
@@ -53,7 +54,8 @@ include '../partials/side-bar.php';
                             id="studentId" 
                             name="student_id" 
                             class="form-control" 
-                            placeholder="Student ID" 
+                            placeholder="Student ID"
+                            maxlength="4" 
                             value="<?php echo $student_id; ?>" 
                         >
                         <label for="studentId">Student ID</label>
