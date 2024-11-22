@@ -446,89 +446,42 @@ function updateStudent($student_id, $first_name, $last_name) {
 }
 
 
-
-//apin ni itang delete student?wa
-//try kepa i comment
-
-// function deleteStudent($student_id) {
-//     $dsn = 'mysql:host=localhost;dbname=dct-ccs-finals'; // Replace 'your_database_name' with your database name
-//     $username = 'root';
-//     $password = '';
- 
-//     try {
-//         $pdo = new PDO($dsn, $username, $password);
-//         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
- 
-//         // Begin transaction
-//         $pdo->beginTransaction();
- 
-//         // Delete from students_subjects
-//         $deleteSubjectsQuery = "DELETE FROM students_subjects WHERE student_id = ?";
-        
-
-//         $stmt = $pdo->prepare($deleteSubjectsQuery);
-//         if (!$stmt->execute([($student_id])) {
-//             throw new Exception("Error deleting from students_subjects");
-//         }
- 
-//         // Delete from students
-//         $deleteStudentQuery = "DELETE FROM students WHERE student_id = ?";
-//         $stmt = $pdo->prepare($deleteStudentQuery);
-//         if (!$stmt->execute([$student_id])) {
-//             throw new Exception("Error deleting from students");
-//         }
- 
-//         // Commit the transaction
-//         $pdo->commit();
-//         return true;
- 
-//     } catch (Exception $e) {
-//         // Rollback the transaction on error
-//         if (isset($pdo)) {
-//             $pdo->rollBack();
-//         }
-//         error_log($e->getMessage());
-//         return false;
-//     }
-// }
-
 function deleteStudent($student_id) {
-    global $conn; // Use the existing mysqli connection
+    global $conn; 
     
-    // Begin transaction
     $conn->begin_transaction();
 
     try {
-        // Delete from students_subjects
+
         $deleteSubjectsQuery = "DELETE FROM students_subjects WHERE student_id = ?";
         $stmt = $conn->prepare($deleteSubjectsQuery);
         if (!$stmt) {
             throw new Exception("Failed to prepare statement for students_subjects: " . $conn->error);
         }
-        $stmt->bind_param("i", $student_id); // Bind student_id as an integer
+        $stmt->bind_param("i", $student_id);
         if (!$stmt->execute()) {
             throw new Exception("Error deleting from students_subjects: " . $stmt->error);
         }
         $stmt->close();
 
-        // Delete from students
+
         $deleteStudentQuery = "DELETE FROM students WHERE student_id = ?";
         $stmt = $conn->prepare($deleteStudentQuery);
         if (!$stmt) {
             throw new Exception("Failed to prepare statement for students: " . $conn->error);
         }
-        $stmt->bind_param("i", $student_id); // Bind student_id as an integer
+        $stmt->bind_param("i", $student_id); 
         if (!$stmt->execute()) {
             throw new Exception("Error deleting from students: " . $stmt->error);
         }
         $stmt->close();
 
-        // Commit the transaction
+
         $conn->commit();
         return true;
 
     } catch (Exception $e) {
-        // Rollback the transaction on error
+
         $conn->rollback();
         error_log($e->getMessage());
         return false;
